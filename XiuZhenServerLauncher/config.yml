@@ -8,6 +8,6 @@ Ftp:
 Bats:
   -
     RegionId: 1
-    WorkDir: D:\repo\leqi\修真情缘\XiuZhenServerLauncher\XiuZhenServerLauncher\bin
+    WorkDir: C:\Users\Administrator\source\repos\XiuZhenServerLauncher\XiuZhenServerLauncher\bin
     Start: test.bat
     Stop: test.bat
