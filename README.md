@@ -1,5 +1,7 @@
 # XiuZhenServerLauncher
 
+https://github.com/doghappy/XiuZhenServerLauncher
+
 修真情缘服务端启动器。  
 
 服务端分了 n 多个区，公司没有采用 CI/CD，做了这个工具，帮助服务端快速部署。 
