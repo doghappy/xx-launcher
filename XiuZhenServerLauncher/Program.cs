@@ -68,13 +68,13 @@ namespace XiuZhenServerLauncher
                                     }
                                     catch (Exception e)
                                     {
-                                        Console.WriteLine(e.Message);
+                                        Console.WriteLine(e);
                                     }
                                 }
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine(e.Message);
+                                Console.WriteLine(e);
                             }
                         }
                     }
