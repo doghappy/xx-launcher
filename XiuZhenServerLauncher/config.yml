@@ -1,0 +1,13 @@
+Whitelist:
+  - 127.0.0.1
+  - 127.0.0.2
+Ftp:
+  Host: ftp://testgm.luckwx.com
+  User: launcher
+  Password: B:6t8*e<hA+&]Xte
+Bats:
+  -
+    RegionId: 1
+    WorkDir: D:\repo\leqi\修真情缘\XiuZhenServerLauncher\XiuZhenServerLauncher\bin
+    Start: test.bat
+    Stop: test.bat
