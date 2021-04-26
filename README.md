@@ -4,7 +4,7 @@
 
 服务端分了 n 多个区，公司没有采用 CI/CD，做了这个工具，帮助服务端快速部署。 
  
-服务端是用 C++ 写的，使用 Socket 提供服务，部署在 Windows Server，此款工具为了开启急用，也采用了 Socket 通信，使用 .NET Framework 框架。避免了运维同事的福报。
+服务端是用 C++ 写的，使用 Socket 提供服务，部署在 Windows Server，此款工具为了开启即用，也采用了 Socket 通信，使用 .NET Framework 框架。避免了运维同事的福报。
 
 ## 如何工作？
 
