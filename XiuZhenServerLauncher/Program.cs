@@ -22,6 +22,7 @@ namespace XiuZhenServerLauncher
             string txt = File.ReadAllText("config.yml");
             var deserializer = new DeserializerBuilder().Build();
             config = deserializer.Deserialize<Config>(txt);
+
         }
 
         static void RecordLog()
@@ -136,14 +137,14 @@ namespace XiuZhenServerLauncher
         static async Task UpdateServerAsync(int regionId)
         {
             var region = GetRegion(regionId);
-            await DownloadDecompressAsync(region.WorkDir, "/Game");
+            await DownloadDecompressAsync(region.WorkDir, config.Ftp.Path + "/Game");
             Console.WriteLine("更新服务完成");
         }
 
         static async Task UpdateConfigAsync(int regionId)
         {
             var region = GetRegion(regionId);
-            await DownloadDecompressAsync(region.WorkDir, "/Config");
+            await DownloadDecompressAsync(region.WorkDir, config.Ftp.Path + "/Config");
             Console.WriteLine("更新配置完成");
         }
 
