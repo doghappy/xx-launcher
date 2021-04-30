@@ -19,6 +19,7 @@ namespace XiuZhenServerLauncher
 
         public override void WriteLine(string value)
         {
+            value = DateTime.Now + value;
             writer.WriteLine(value);
             File.AppendAllText(path, value);
             File.AppendAllText(path, Environment.NewLine);
