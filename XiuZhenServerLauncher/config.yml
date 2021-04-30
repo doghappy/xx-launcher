@@ -5,7 +5,7 @@ Ftp:
   Host: ftp://testgm.luckwx.com
   User: launcher
   Password: B:6t8*e<hA+&]Xte
-Bats:
+Regions:
   -
     RegionId: 1
     WorkDir: C:\Users\Administrator\source\repos\XiuZhenServerLauncher\XiuZhenServerLauncher\bin

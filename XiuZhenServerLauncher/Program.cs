@@ -106,44 +106,44 @@ namespace XiuZhenServerLauncher
             }
         }
 
-        static Bat GetBat(int regionId)
+        static Region GetRegion(int regionId)
         {
-            return config.Bats.Single(b => b.RegionId == regionId);
+            return config.Regions.Single(b => b.RegionId == regionId);
         }
 
         static void StartServer(int regionId)
         {
             Console.WriteLine("开服");
-            var bat = GetBat(regionId);
+            var region = GetRegion(regionId);
             Process.Start(new ProcessStartInfo
             {
-                WorkingDirectory = bat.WorkDir,
-                FileName = bat.Start
+                WorkingDirectory = region.WorkDir,
+                FileName = region.Start
             });
         }
 
         static void StopServer(int regionId)
         {
             Console.WriteLine("关服");
-            var bat = GetBat(regionId);
+            var region = GetRegion(regionId);
             Process.Start(new ProcessStartInfo
             {
-                WorkingDirectory = bat.WorkDir,
-                FileName = bat.Stop
+                WorkingDirectory = region.WorkDir,
+                FileName = region.Stop
             });
         }
 
         static async Task UpdateServerAsync(int regionId)
         {
-            var bat = GetBat(regionId);
-            await DownloadDecompressAsync(bat.WorkDir, "/Game");
+            var region = GetRegion(regionId);
+            await DownloadDecompressAsync(region.WorkDir, "/Game");
             Console.WriteLine("更新服务完成");
         }
 
         static async Task UpdateConfigAsync(int regionId)
         {
-            var bat = GetBat(regionId);
-            await DownloadDecompressAsync(bat.WorkDir, "/Config");
+            var region = GetRegion(regionId);
+            await DownloadDecompressAsync(region.WorkDir, "/Config");
             Console.WriteLine("更新配置完成");
         }
 

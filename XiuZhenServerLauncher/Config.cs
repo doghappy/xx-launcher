@@ -6,10 +6,10 @@ namespace XiuZhenServerLauncher
     {
         public Ftp Ftp { get; set; }
         public List<string> Whitelist { get; set; }
-        public List<Bat> Bats { get; set; }
+        public List<Region> Regions { get; set; }
     }
 
-    class Bat
+    class Region
     {
         public int RegionId { get; set; }
         public string WorkDir { get; set; }
