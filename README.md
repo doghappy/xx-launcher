@@ -39,7 +39,8 @@ Ftp:
   Host: ftp://example.com
   User: launcher
   Password: B:6t8*e<hA+&]Xte
-Bats:
+  Path: /GangAoTai
+Regions:
   -
     # 区 id，一台服务器可能会部署多个区
     RegionId: 1
