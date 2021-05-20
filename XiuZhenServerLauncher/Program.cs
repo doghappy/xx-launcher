@@ -65,7 +65,7 @@ namespace XiuZhenServerLauncher
                                     try
                                     {
                                         var req = JsonConvert.DeserializeObject<Request<int>>(data);
-                                        await ExcuteRequestAsync(req);
+                                        await ExcuteRequestAsync(client.Client, req);
                                     }
                                     catch (Exception e)
                                     {
@@ -88,7 +88,7 @@ namespace XiuZhenServerLauncher
             }
         }
 
-        static async Task ExcuteRequestAsync(Request<int> req)
+        static async Task ExcuteRequestAsync(Socket socket, Request<int> req)
         {
             switch (req.Id)
             {
@@ -103,6 +103,9 @@ namespace XiuZhenServerLauncher
                     break;
                 case 3:
                     await UpdateConfigAsync(req.Data);
+                    break;
+                case 4:
+                    await DmpCountAsync(socket, req.Data);
                     break;
             }
         }
@@ -146,6 +149,21 @@ namespace XiuZhenServerLauncher
             var region = GetRegion(regionId);
             await DownloadDecompressAsync(region.WorkDir, config.Ftp.Path + "/Config");
             Console.WriteLine("更新配置完成");
+        }
+
+        static Task DmpCountAsync(Socket socket, int regionId)
+        {
+            var region = GetRegion(regionId);
+            var dir = new DirectoryInfo(region.WorkDir);
+            var files = dir.GetFiles("*.dmp");
+            string json = JsonConvert.SerializeObject(new Request<int>
+            {
+                Id = 4,
+                Data = files.Length
+            });
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            socket.SendAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
+            return Task.CompletedTask;
         }
 
         static async Task OnConnected(Func<FtpClient, Task> func)

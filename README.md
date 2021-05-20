@@ -16,6 +16,7 @@ https://github.com/doghappy/XiuZhenServerLauncher
 - 关闭服务
 - 更新配置
 - 更新服务
+- 查询 dmp 文件数量
 
 ### 开启/关闭服务
 
@@ -33,7 +34,6 @@ https://github.com/doghappy/XiuZhenServerLauncher
 # 白名单，可配置多个。服务器最好在外层设置白名单
 Whitelist:
   - 127.0.0.1
-  - 127.0.0.2
 # 从配置的 FTP 上下载更新包
 Ftp:
   Host: ftp://example.com
