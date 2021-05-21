@@ -153,13 +153,18 @@ namespace XiuZhenServerLauncher
 
         static Task DmpCountAsync(Socket socket, int regionId)
         {
-            var region = GetRegion(regionId);
-            var dir = new DirectoryInfo(region.WorkDir);
-            var files = dir.GetFiles("*.dmp");
+            var region = config.Regions.SingleOrDefault(b => b.RegionId == regionId);
+            int count = 0;
+            if (region != null)
+            {
+                var dir = new DirectoryInfo(region.WorkDir);
+                var files = dir.GetFiles("*.dmp");
+                count = files.Length;
+            }
             string json = JsonConvert.SerializeObject(new Request<int>
             {
                 Id = 4,
-                Data = files.Length
+                Data = count
             });
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             socket.SendAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
