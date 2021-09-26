@@ -1,13 +1,17 @@
+# 白名单，可配置多个。服务器最好在外层设置白名单
 Whitelist:
   - 127.0.0.1
   - 127.0.0.2
+# 从配置的 FTP 上下载更新包
 Ftp:
   Host: ftp://testgm.luckwx.com
+  Port: 22
   User: launcher
   Password: B:6t8*e<hA+&]Xte
   Path: /对外测试服
 Regions:
   -
+    # 区 id，一台服务器可能会部署多个区
     RegionId: 1
     WorkDir: C:\Users\Administrator\source\repos\XiuZhenServerLauncher\XiuZhenServerLauncher\bin
     Start: test.bat

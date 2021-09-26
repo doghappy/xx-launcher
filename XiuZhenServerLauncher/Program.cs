@@ -175,6 +175,7 @@ namespace XiuZhenServerLauncher
         {
             using (var ftp = new FtpClient(config.Ftp.Host))
             {
+                ftp.Port = config.Ftp.Port;
                 ftp.Credentials = new NetworkCredential(config.Ftp.User, config.Ftp.Password);
                 await ftp.ConnectAsync();
                 await func(ftp);
