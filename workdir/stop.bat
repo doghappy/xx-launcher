@@ -1,1 +1,1 @@
-echo %TIME% >> %GOPATH%/src/github.com/doghappy/xx/launcher/workdir/stop.log
+echo %TIME% >> %~dp0/stop.log
