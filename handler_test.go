@@ -13,7 +13,7 @@ import (
 
 func init() {
 	readConfig()
-	startProcess = func(name string) (*os.Process, error) {
+	startProcess = func(dir string, name string) (*os.Process, error) {
 		return nil, nil
 	}
 }

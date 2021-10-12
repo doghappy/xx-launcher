@@ -22,7 +22,7 @@ type reqBody struct {
 	RegionId int `json:"regionId"`
 }
 
-var startProcess = func(name string) (*os.Process, error) {
+var startProcess = func(dir string, name string) (*os.Process, error) {
 	procAttr := &os.ProcAttr{
 		Env: os.Environ(),
 		Files: []*os.File{
@@ -31,6 +31,7 @@ var startProcess = func(name string) (*os.Process, error) {
 			os.Stderr,
 		},
 	}
+	procAttr.Dir = dir
 	return os.StartProcess(name, []string{}, procAttr)
 }
 
@@ -78,9 +79,7 @@ func runBat(res http.ResponseWriter, req *http.Request, prefix string, nameProvi
 	if body != (reqBody{}) && region != (configRegion{}) {
 		log.Printf("[%s] RegionId: %d\n", prefix, body.RegionId)
 
-		name := path.Join(region.WorkDir, nameProvider(region))
-
-		_, err := startProcess(name)
+		_, err := startProcess(region.WorkDir, nameProvider(region))
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintln(res, err.Error())
