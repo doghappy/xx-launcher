@@ -28,7 +28,7 @@ var startProcess = func(name string) (*os.Process, error) {
 	return os.StartProcess(name, []string{}, procAttr)
 }
 
-func baseHandler(res http.ResponseWriter, req *http.Request) (reqBody, configRegion) {
+func getReqBodyAndRegion(res http.ResponseWriter, req *http.Request) (reqBody, configRegion) {
 	decoder := json.NewDecoder(req.Body)
 	body := reqBody{}
 	region := configRegion{}
@@ -58,12 +58,12 @@ func baseHandler(res http.ResponseWriter, req *http.Request) (reqBody, configReg
 	return body, region
 }
 
-func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	body, region := baseHandler(res, req)
+func runBat(res http.ResponseWriter, req *http.Request, prefix string, nameProvider func(configRegion) string) {
+	body, region := getReqBodyAndRegion(res, req)
 	if body != (reqBody{}) && region != (configRegion{}) {
-		log.Printf("[开服] RegionId: %d\n", body.RegionId)
+		log.Printf("[%s] RegionId: %d\n", prefix, body.RegionId)
 
-		name := path.Join(region.WorkDir, region.Start)
+		name := path.Join(region.WorkDir, nameProvider(region))
 
 		_, err := startProcess(name)
 		if err != nil {
@@ -75,4 +75,12 @@ func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 
 		fmt.Fprintln(res, "ok")
 	}
+}
+
+func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	runBat(res, req, "开服", func(region configRegion) string { return region.Start })
+}
+
+func stopHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	runBat(res, req, "关服", func(region configRegion) string { return region.Stop })
 }
