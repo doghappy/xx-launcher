@@ -19,7 +19,7 @@ var appConfig = config{}
 func main() {
 	readConfig()
 	router := httprouter.New()
-	router.POST("/start", StartHandler)
+	router.POST("/start", startHandler)
 	log.Printf("[启动器] 服务地址 %s\n", appConfig.LauncherUrl)
 	log.Fatalln(http.ListenAndServe(appConfig.LauncherUrl, router))
 }

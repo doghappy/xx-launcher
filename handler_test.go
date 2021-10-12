@@ -57,7 +57,7 @@ func TestStart(t *testing.T) {
 
 	for _, test := range tests {
 		router := httprouter.New()
-		router.POST("/start", StartHandler)
+		router.POST("/start", startHandler)
 		body := strings.NewReader(test.ReqContent)
 		req, err := http.NewRequest(http.MethodPost, "/start", body)
 		if err != nil {

@@ -13,6 +13,7 @@ import (
 
 type reqBody struct {
 	RegionId int `json:"regionId"`
+	Type     int `json:"type"`
 }
 
 var startProcess = func(name string) (*os.Process, error) {
@@ -27,14 +28,15 @@ var startProcess = func(name string) (*os.Process, error) {
 	return os.StartProcess(name, []string{}, procAttr)
 }
 
-func StartHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func baseHandler(res http.ResponseWriter, req *http.Request) (reqBody, configRegion) {
 	decoder := json.NewDecoder(req.Body)
-	var body reqBody
+	body := reqBody{}
+	region := configRegion{}
 
 	if err := decoder.Decode(&body); err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(res, err.Error())
-		return
+		return body, region
 	}
 
 	index := -1
@@ -48,21 +50,29 @@ func StartHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 	if index == -1 {
 		res.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(res, "invalid regionId: %d\n", body.RegionId)
-		return
+		return body, region
 	}
 
-	log.Printf("[开服] RegionId: %d\n", body.RegionId)
+	region = appConfig.Regions[index]
 
-	region := appConfig.Regions[index]
-	name := path.Join(region.WorkDir, region.Start)
+	return body, region
+}
 
-	_, err := startProcess(name)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(res, err.Error())
-		log.Println(err)
-		return
+func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	body, region := baseHandler(res, req)
+	if body != (reqBody{}) && region != (configRegion{}) {
+		log.Printf("[开服] RegionId: %d\n", body.RegionId)
+
+		name := path.Join(region.WorkDir, region.Start)
+
+		_, err := startProcess(name)
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintln(res, err.Error())
+			log.Println(err)
+			return
+		}
+
+		fmt.Fprintln(res, "ok")
 	}
-
-	fmt.Fprintln(res, "ok")
 }
