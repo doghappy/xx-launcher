@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -9,14 +10,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func init() {
-	// log.SetPrefix("launcher: ")
-	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
-}
-
 var appConfig = config{}
 
 func main() {
+	file, err := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Panicln("⚠️日志无法写入到文件！")
+	}
+	mw := io.MultiWriter(os.Stdout, file)
+	defer file.Close()
+	log.SetOutput(mw)
+	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
+
 	readConfig()
 	router := httprouter.New()
 	router.POST("/start", ipFilter(startHandler))

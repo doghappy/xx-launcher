@@ -88,6 +88,8 @@ func runBat(res http.ResponseWriter, req *http.Request, prefix string, nameProvi
 			return
 		}
 
+		log.Printf("%s成功\n", prefix)
+
 		fmt.Fprintln(res, "ok")
 	}
 }
@@ -120,13 +122,17 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 	}
 
 	log.Printf("⏳正在解压📦'%s'……\n", name)
-	err = archiver.Unarchive(name, region.WorkDir)
+	rar := archiver.Rar{
+		OverwriteExisting: true,
+	}
+	err = rar.Unarchive(name, region.WorkDir)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(res, err.Error())
 		log.Println(err)
 		return
 	}
+	log.Println("✔️解压完成📦")
 
 	fmt.Fprintln(res, "✔️")
 }
@@ -151,13 +157,18 @@ func updateConfigHandler(res http.ResponseWriter, req *http.Request, _ httproute
 	}
 
 	log.Printf("⏳正在解压📦'%s'……\n", name)
-	err = archiver.Unarchive(name, region.WorkDir)
+
+	rar := archiver.Rar{
+		OverwriteExisting: true,
+	}
+	err = rar.Unarchive(name, region.WorkDir)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(res, err.Error())
 		log.Println(err)
 		return
 	}
+	log.Println("✔️解压完成📦")
 
 	fmt.Fprintln(res, "✔️")
 }
