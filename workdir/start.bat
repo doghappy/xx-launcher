@@ -1,0 +1,1 @@
+echo %TIME% >> %GOPATH%/src/github.com/doghappy/xx/launcher/workdir/start.log

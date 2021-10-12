@@ -1,1 +1,0 @@
-echo %TIME% >> stop.log

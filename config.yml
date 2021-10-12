@@ -13,6 +13,6 @@ Regions:
   -
     # 区 id，一台服务器可能会部署多个区
     RegionId: 1
-    WorkDir: D:\repo\go\src\github.com\doghappy\xx\launcher\test
+    WorkDir: D:\repo\go\src\github.com\doghappy\xx\launcher\workdir
     Start: start.bat
     Stop: stop.bat
