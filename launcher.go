@@ -22,6 +22,8 @@ func main() {
 	router.POST("/start", startHandler)
 	router.POST("/stop", stopHandler)
 	router.POST("/server", updateServerHandler)
+	router.POST("/config", updateConfigHandler)
+	router.GET("/dmp", dmpHandler)
 	log.Printf("[启动器] 服务地址 %s\n", appConfig.LauncherUrl)
 	log.Fatalln(http.ListenAndServe(appConfig.LauncherUrl, router))
 }
