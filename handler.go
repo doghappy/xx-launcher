@@ -245,3 +245,33 @@ func dmpHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params)
 
 	fmt.Fprintln(res, count)
 }
+
+func ipFilter(handler httprouter.Handle) httprouter.Handle {
+	return func(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+		ip := req.Header.Get("X-Real-Ip")
+		if ip == "" {
+			ip = req.Header.Get("X-Forwarded-For")
+		}
+		if ip == "" {
+			ip = req.RemoteAddr
+		}
+		ip = strings.Split(ip, ":")[0]
+
+		contains := false
+		for _, item := range appConfig.Whitelist {
+			if item == ip {
+				contains = true
+				break
+			}
+		}
+
+		if contains {
+			handler(res, req, p)
+		} else {
+			res.WriteHeader(http.StatusForbidden)
+			msg := fmt.Sprintf("非白名单 ip '%s' 试图访问服务，已拒绝。", ip)
+			fmt.Fprintln(res, msg)
+			log.Println(msg)
+		}
+	}
+}
