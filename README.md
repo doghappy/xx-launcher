@@ -1,16 +1,14 @@
-# XiuZhenServerLauncher
+# xx-launcher
 
-https://github.com/doghappy/XiuZhenServerLauncher
+https://github.com/doghappy/xx-launcher
 
 修真情缘服务端启动器。  
 
 服务端分了 n 多个区，公司没有采用 CI/CD，做了这个工具，帮助服务端快速部署。 
- 
-服务端是用 C++ 写的，使用 Socket 提供服务，部署在 Windows Server，此款工具为了开启即用，也采用了 Socket 通信，使用 .NET Framework 框架。避免了运维同事的福报。
 
 ## 如何工作？
 
-此工具是一个 Socket 服务端程序，接收客户端的请求，执行客户端需要的功能所对应的脚本，从而实现了以下功能：
+此工具是一个服务端程序，接收客户端的请求，执行客户端需要的功能所对应的脚本，从而实现了以下功能：
 
 - 开启服务
 - 关闭服务
@@ -31,6 +29,7 @@ https://github.com/doghappy/XiuZhenServerLauncher
 配置文件使用 yml，需要符合 yml 的语法。
 
 ```yml
+LauncherUrl: 127.0.0.1:8080
 # 白名单，可配置多个。服务器最好在外层设置白名单
 Whitelist:
   - 127.0.0.1
