@@ -2,12 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"sort"
+	"strings"
 
+	"github.com/jlaffaye/ftp"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -83,4 +87,59 @@ func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 
 func stopHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	runBat(res, req, "关服", func(region configRegion) string { return region.Stop })
+}
+
+func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	dirPath := path.Join(appConfig.Ftp.Path, "Game")
+	err := downloadFromFtp(dirPath)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(res, err.Error())
+		log.Println(err)
+		return
+	}
+	fmt.Fprintln(res, "updateServerHandler")
+}
+
+func downloadFromFtp(dirPath string) error {
+	host := appConfig.Ftp.Host
+	host = strings.TrimPrefix(host, "ftp://")
+	host = strings.TrimPrefix(host, "ftps://")
+
+	addr := fmt.Sprintf("%s:%d", host, appConfig.Ftp.Port)
+	conn, err := ftp.Dial(addr)
+	if err != nil {
+		return err
+	}
+	err = conn.Login(appConfig.Ftp.User, appConfig.Ftp.Password)
+	if err != nil {
+		return err
+	}
+
+	entries, err := conn.List(dirPath)
+	if err != nil {
+		return err
+	}
+	if len(entries) == 0 {
+		return errors.New("❌更新失败，未找到更新包。")
+	}
+
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].Name > entries[j].Name
+	})
+	log.Println("⏳正在下载……")
+
+	name := path.Join(dirPath, entries[0].Name)
+	res, err := conn.Retr(name)
+	if err != nil {
+		return err
+	}
+	defer res.Close()
+
+	// buf, err := ioutil.ReadAll(res)
+	// if err != nil {
+	// 	return err
+	// }
+
+	return nil
 }

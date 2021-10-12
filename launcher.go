@@ -11,7 +11,7 @@ import (
 
 func init() {
 	// log.SetPrefix("launcher: ")
-	// log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Lshortfile)
 }
 
 var appConfig = config{}
@@ -21,6 +21,7 @@ func main() {
 	router := httprouter.New()
 	router.POST("/start", startHandler)
 	router.POST("/stop", stopHandler)
+	router.POST("/server", updateServerHandler)
 	log.Printf("[启动器] 服务地址 %s\n", appConfig.LauncherUrl)
 	log.Fatalln(http.ListenAndServe(appConfig.LauncherUrl, router))
 }
