@@ -224,7 +224,7 @@ func dmpHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params)
 	regionId, err := strconv.Atoi(strRegionId)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		msg := "❌regionId 不合符"
+		msg := "❌regionId 不合法"
 		fmt.Fprintln(res, msg)
 		log.Println(msg)
 		return
