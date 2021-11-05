@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/jlaffaye/ftp"
 	"github.com/julienschmidt/httprouter"
@@ -21,6 +22,8 @@ import (
 type reqBody struct {
 	RegionId int `json:"regionId"`
 }
+
+var lock = sync.Mutex{}
 
 var startProcess = func(dir string, name string) (*os.Process, error) {
 	procAttr := &os.ProcAttr{
@@ -94,14 +97,21 @@ func runBat(res http.ResponseWriter, req *http.Request, prefix string, nameProvi
 }
 
 func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	lock.Lock()
+	defer lock.Unlock()
 	runBat(res, req, "📢开服", func(region configRegion) string { return region.Start })
 }
 
 func stopHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	lock.Lock()
+	defer lock.Unlock()
 	runBat(res, req, "⚙️关服", func(region configRegion) string { return region.Stop })
 }
 
 func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	_, region := getReqBodyAndRegion(res, req)
 	if region == (configRegion{}) {
 		res.WriteHeader(http.StatusBadRequest)
@@ -137,6 +147,9 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 }
 
 func updateConfigHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	_, region := getReqBodyAndRegion(res, req)
 	if region == (configRegion{}) {
 		res.WriteHeader(http.StatusBadRequest)
