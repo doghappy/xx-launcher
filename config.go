@@ -2,6 +2,7 @@ package main
 
 type config struct {
 	LauncherUrl string   `yaml:"LauncherUrl"`
+	Archive     string   `yaml:"Archive"`
 	Whitelist   []string `yaml:"Whitelist"`
 	Ftp         struct {
 		Host     string `yaml:"Host"`
@@ -18,4 +19,17 @@ type configRegion struct {
 	WorkDir  string `yaml:"WorkDir"`
 	Start    string `yaml:"Start"`
 	Stop     string `yaml:"Stop"`
+}
+
+func (c *config) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	type rawConfig config
+	raw := rawConfig{
+		LauncherUrl: "127.0.0.1:9599",
+		Archive:     "servers",
+	}
+	if err := unmarshal(&raw); err != nil {
+		return err
+	}
+	*c = config(raw)
+	return nil
 }

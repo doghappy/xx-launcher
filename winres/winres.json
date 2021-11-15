@@ -13,7 +13,7 @@
       "0409": {
         "identity": {
           "name": "xx launcher",
-          "version": "1.0.2"
+          "version": "1.0.3"
         },
         "description": "",
         "minimum-os": "win7",
@@ -37,8 +37,8 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "1.0.2.0",
-          "product_version": "1.0.2.0"
+          "file_version": "1.0.3.0",
+          "product_version": "1.0.3.0"
         },
         "info": {
           "0409": {
@@ -52,7 +52,7 @@
             "OriginalFilename": "",
             "PrivateBuild": "",
             "ProductName": "xx launcher",
-            "ProductVersion": "1.0.2",
+            "ProductVersion": "1.0.3",
             "SpecialBuild": ""
           }
         }

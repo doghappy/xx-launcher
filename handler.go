@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -121,6 +122,14 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 		return
 	}
 
+	err := archiveOldFiles(region.WorkDir)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(res, err.Error())
+		log.Println(err)
+		return
+	}
+
 	dirPath := path.Join(appConfig.Ftp.Path, "Game")
 	name, err := downloadFromFtp(dirPath, region)
 	if err != nil {
@@ -158,6 +167,8 @@ func updateConfigHandler(res http.ResponseWriter, req *http.Request, _ httproute
 		log.Println(msg)
 		return
 	}
+
+	archiveOldFiles(region.WorkDir)
 
 	dirPath := path.Join(appConfig.Ftp.Path, "Config")
 	name, err := downloadFromFtp(dirPath, region)
@@ -297,4 +308,29 @@ func ipFilter(handler httprouter.Handle) httprouter.Handle {
 			log.Println(msg)
 		}
 	}
+}
+
+func archiveOldFiles(workDir string) error {
+	files, err := ioutil.ReadDir(workDir)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		name := f.Name()
+		if strings.HasSuffix(name, ".Game.rar") || strings.HasSuffix(name, ".Config.rar") {
+			go func(f fs.FileInfo) {
+				oldpath := path.Join(workDir, name)
+				newdir := path.Join(workDir, appConfig.Archive)
+				if err := os.MkdirAll(newdir, os.ModePerm); err != nil {
+					log.Panicln(err)
+					return
+				}
+				newpath := path.Join(workDir, appConfig.Archive, name)
+				if err := os.Rename(oldpath, newpath); err != nil {
+					log.Panicln(err)
+				}
+			}(f)
+		}
+	}
+	return nil
 }
