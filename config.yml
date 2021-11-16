@@ -17,3 +17,4 @@ Regions:
     WorkDir: C:\Users\Administrator\source\repos\xx-launcher\workdir
     Start: start.bat
     Stop: stop.bat
+    Bat: start.bat

@@ -29,6 +29,7 @@ func main() {
 	router.POST("/server", ipFilter(updateServerHandler))
 	router.POST("/config", ipFilter(updateConfigHandler))
 	router.GET("/dmp", ipFilter(dmpHandler))
+	router.POST("/bat", ipFilter(startBatHandler))
 	log.Printf("[启动器] 服务地址 %s\n", appConfig.LauncherUrl)
 	log.Fatalln(http.ListenAndServe(appConfig.LauncherUrl, router))
 }
