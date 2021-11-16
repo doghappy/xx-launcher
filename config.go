@@ -22,6 +22,7 @@ type configRegion struct {
 	WorkDir  string `yaml:"WorkDir"`
 	Start    string `yaml:"Start"`
 	Stop     string `yaml:"Stop"`
+	Bat      string `yaml:"Bat"`
 }
 
 func (c *config) UnmarshalYAML(unmarshal func(interface{}) error) error {

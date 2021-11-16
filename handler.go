@@ -103,6 +103,10 @@ func runBat(res http.ResponseWriter, req *http.Request, prefix string, nameProvi
 	}
 }
 
+func startBatHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	runBat(res, req, "📢Bat", func(region configRegion) string { return region.Bat })
+}
+
 func startHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	lock.Lock()
 	defer lock.Unlock()
