@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jlaffaye/ftp"
 	"github.com/julienschmidt/httprouter"
@@ -22,6 +23,11 @@ import (
 
 type reqBody struct {
 	RegionId int `json:"regionId"`
+}
+
+type ftpResult struct {
+	file string
+	err  error
 }
 
 var lock = sync.Mutex{}
@@ -111,7 +117,11 @@ func stopHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	lock.Lock()
-	defer lock.Unlock()
+	log.Println("🔒加锁")
+	defer func() {
+		log.Println("🔓解锁")
+		lock.Unlock()
+	}()
 
 	_, region := getReqBodyAndRegion(res, req)
 	if region == (configRegion{}) {
@@ -122,6 +132,7 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 		return
 	}
 
+	log.Println("⏳归档……")
 	err := archiveOldFiles(region.WorkDir)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -129,6 +140,7 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 		log.Println(err)
 		return
 	}
+	log.Println("✔️归档完成")
 
 	dirPath := path.Join(appConfig.Ftp.Path, "Game")
 	name, err := downloadFromFtp(dirPath, region)
@@ -197,49 +209,89 @@ func updateConfigHandler(res http.ResponseWriter, req *http.Request, _ httproute
 }
 
 func downloadFromFtp(dirPath string, region configRegion) (string, error) {
-	host := appConfig.Ftp.Host
-	host = strings.TrimPrefix(host, "ftp://")
-	host = strings.TrimPrefix(host, "ftps://")
+	ch := make(chan ftpResult)
+	go func() {
+		defer close(ch)
 
-	addr := fmt.Sprintf("%s:%d", host, appConfig.Ftp.Port)
-	conn, err := ftp.Dial(addr)
-	if err != nil {
-		return "", err
-	}
-	err = conn.Login(appConfig.Ftp.User, appConfig.Ftp.Password)
-	if err != nil {
-		return "", err
-	}
+		host := appConfig.Ftp.Host
+		host = strings.TrimPrefix(host, "ftp://")
+		host = strings.TrimPrefix(host, "ftps://")
 
-	entries, err := conn.List(dirPath)
-	if err != nil {
-		return "", err
-	}
-	if len(entries) == 0 {
-		return "", errors.New("❌更新失败，未找到更新包。")
-	}
+		addr := fmt.Sprintf("%s:%d", host, appConfig.Ftp.Port)
 
-	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].Name > entries[j].Name
-	})
+		log.Println("📡正在连接 ftp 服务器……")
+		conn, err := ftp.Dial(addr)
+		if err != nil {
+			ch <- ftpResult{
+				err: err,
+			}
+			return
+		}
+		log.Println("✔️成功与 ftp 服务器建立连接")
+		log.Println("⏳正在登录 ftp……")
+		err = conn.Login(appConfig.Ftp.User, appConfig.Ftp.Password)
+		if err != nil {
+			ch <- ftpResult{
+				err: err,
+			}
+			return
+		}
+		log.Println("✔️登录成功")
 
-	name := path.Join(dirPath, entries[0].Name)
-	log.Printf("⏳正在下载'%s'……\n", name)
-	res, err := conn.Retr(name)
-	if err != nil {
-		return "", err
+		log.Println("⏳正在获取 ftp 目录信息……")
+		entries, err := conn.List(dirPath)
+		if err != nil {
+			ch <- ftpResult{
+				err: err,
+			}
+			return
+		}
+		log.Println("✔️成功获取 ftp 目录信息")
+		if len(entries) == 0 {
+			ch <- ftpResult{
+				err: errors.New("❌更新失败，未找到更新包。"),
+			}
+			return
+		}
+
+		sort.Slice(entries, func(i, j int) bool {
+			return entries[i].Name > entries[j].Name
+		})
+
+		name := path.Join(dirPath, entries[0].Name)
+		log.Printf("⏳正在下载'%s'……\n", name)
+		res, err := conn.Retr(name)
+		if err != nil {
+			ch <- ftpResult{
+				err: err,
+			}
+			return
+		}
+		log.Println("✔️已成功获得响应")
+		defer res.Close()
+
+		log.Println("⏳正在把响应写入到文件")
+		buf, err := ioutil.ReadAll(res)
+		if err != nil {
+			ch <- ftpResult{
+				err: err,
+			}
+			return
+		}
+		newName := path.Join(region.WorkDir, entries[0].Name)
+		ioutil.WriteFile(newName, buf, 0644)
+		log.Println("✔️写入完成")
+
+		ch <- ftpResult{
+			file: newName,
+		}
+	}()
+	select {
+	case <-time.After(time.Duration(appConfig.Ftp.Timeout) * time.Millisecond):
+		return "", errors.New("❌Ftp超时")
+	case fr := <-ch:
+		return fr.file, fr.err
 	}
-	defer res.Close()
-
-	buf, err := ioutil.ReadAll(res)
-	if err != nil {
-		return "", err
-	}
-	newName := path.Join(region.WorkDir, entries[0].Name)
-	ioutil.WriteFile(newName, buf, 0644)
-	log.Println("✔️下载完成")
-
-	return newName, nil
 }
 
 func dmpHandler(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {

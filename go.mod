@@ -6,7 +6,7 @@ require (
 	github.com/andybalholm/brotli v1.0.0 // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/jlaffaye/ftp v0.0.0-20210307004419-5d4190119067 // indirect
+	github.com/jlaffaye/ftp v0.0.0-20211029032751-b1140299f4df // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/compress v1.10.10 // indirect
 	github.com/klauspost/pgzip v1.2.4 // indirect
