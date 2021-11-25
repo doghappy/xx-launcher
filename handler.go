@@ -374,12 +374,12 @@ func archiveOldFiles(workDir string) error {
 				oldpath := path.Join(workDir, name)
 				newdir := path.Join(workDir, appConfig.Archive)
 				if err := os.MkdirAll(newdir, os.ModePerm); err != nil {
-					log.Panicln(err)
+					log.Println(err)
 					return
 				}
 				newpath := path.Join(workDir, appConfig.Archive, name)
 				if err := os.Rename(oldpath, newpath); err != nil {
-					log.Panicln(err)
+					log.Println(err)
 				}
 			}(f)
 		}
