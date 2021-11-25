@@ -220,6 +220,7 @@ func downloadFromFtp(dirPath string, region configRegion) (string, error) {
 		addr := fmt.Sprintf("%s:%d", host, appConfig.Ftp.Port)
 
 		log.Println("📡正在连接 ftp 服务器……")
+		// ftp目前还没有发布新版本，不能使用 ftp.DialWithShutTimeout(5*time.Second)
 		conn, err := ftp.Dial(addr)
 		if err != nil {
 			ch <- ftpResult{
@@ -286,6 +287,7 @@ func downloadFromFtp(dirPath string, region configRegion) (string, error) {
 			file: newName,
 		}
 	}()
+	// 如果 ftp 库更新后，就不用自己处理超时了
 	select {
 	case <-time.After(time.Duration(appConfig.Ftp.Timeout) * time.Millisecond):
 		return "", errors.New("❌Ftp超时")
