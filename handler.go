@@ -133,7 +133,7 @@ func updateServerHandler(res http.ResponseWriter, req *http.Request, _ httproute
 	}
 
 	log.Println("⏳归档……")
-	err := archiveOldFiles(region.WorkDir)
+	err := archiveOldFiles(region.WorkDir, ".Game.rar")
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(res, err.Error())
@@ -180,7 +180,7 @@ func updateConfigHandler(res http.ResponseWriter, req *http.Request, _ httproute
 		return
 	}
 
-	archiveOldFiles(region.WorkDir)
+	archiveOldFiles(region.WorkDir, ".Config.rar")
 
 	dirPath := path.Join(appConfig.Ftp.Path, "Config")
 	name, err := downloadFromFtp(dirPath, region)
@@ -364,14 +364,15 @@ func ipFilter(handler httprouter.Handle) httprouter.Handle {
 	}
 }
 
-func archiveOldFiles(workDir string) error {
+// suffix: ".Game.rar" or ".Config.rar"
+func archiveOldFiles(workDir string, suffix string) error {
 	files, err := ioutil.ReadDir(workDir)
 	if err != nil {
 		return err
 	}
 	for _, f := range files {
 		name := f.Name()
-		if strings.HasSuffix(name, ".Game.rar") || strings.HasSuffix(name, ".Config.rar") {
+		if strings.HasSuffix(name, suffix) {
 			go func(f fs.FileInfo) {
 				oldpath := path.Join(workDir, name)
 				newdir := path.Join(workDir, appConfig.Archive)
